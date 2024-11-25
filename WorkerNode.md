@@ -94,3 +94,18 @@ Detta kommando skapar en Pod som kör en nginx-container och distribuerar den p�
   ```
 
   Detta kommer att visa loggar för k3s-agenten och kan ge mer information om varför en nod inte kan ansluta.
+
+
+## Montera NAS
+Installera nfs-common
+```bash
+sudo apt install nfs-common -y
+```
+lägg till följande i /etc/fstab
+```bash
+<IPTillNAS>:/export/<share> </mnt/nas> nfs defaults 0 0
+```
+montera NAS
+```bash
+sudo mount -a
+```

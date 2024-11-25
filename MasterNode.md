@@ -85,3 +85,18 @@ Du bör se alla noder (master och workers) i `Ready`-status.
 
 - **Om noder inte visas**: Kontrollera att alla enheter är på samma nätverk och att ingen brandvägg blockerar port 6443.
 - **Om installationen misslyckas**: Se till att din Raspberry Pi har tillräckligt med lagringsutrymme och att den senaste versionen av K3s används.
+
+
+## Montera NAS
+Installera nfs-common
+```bash
+sudo apt install nfs-common -y
+```
+lägg till följande i /etc/fstab
+```bash
+<IPTillNAS>:/export/<share> </mnt/nas> nfs defaults 0 0
+```
+montera NAS
+```bash
+sudo mount -a
+```
