@@ -30,10 +30,10 @@ För både Raspberry Pi OS och Debian behöver du ett 64-bitars operativsystem. 
 
 Välj en av dina Raspberry Pi-enheter att vara **master-nod**.
 
-1. **Ladda ner och installera K3s**:
-   Använd `wget` för att hämta och köra installationsskriptet. På master-noden kör:
+1. **Installera K3s med flaggan `--no-taint-master`**:
+   För att se till att master-noden kan köra användarpods, använd flaggan `--no-taint-master` när du installerar K3s. Detta gör att master-noden inte får den taint som normalt hindrar användarpods från att schemaläggas där. Kör följande kommando på master-noden:
    ```bash
-   wget -q -O - https://get.k3s.io | sh -
+   wget -q -O - https://get.k3s.io | sh -s - --no-taint-master
    ```
 
 2. **Kontrollera installationen**:
@@ -42,7 +42,7 @@ Välj en av dina Raspberry Pi-enheter att vara **master-nod**.
    sudo kubectl get nodes
    ```
 
-   Du bör se din master-nod listad.
+   Du bör nu se din master-nod listad som `Ready`.
 
 ### **Steg 3: Installera K3s på Worker-noder**
 
@@ -59,7 +59,7 @@ På varje Raspberry Pi-enhet som ska fungera som **worker-nod**, kör följande 
 2. **Installera K3s på Worker-noder**:
    På varje worker-nod, kör följande kommando och ersätt `<MASTER_IP>` med IP-adressen till master-noden och `<TOKEN>` med token som du fick från master-noden:
    ```bash
-   wget -q -O - https://get.k3s.io | K3S_URL=https://<MASTER_IP>:6443 K3S_TOKEN=<TOKEN> sh -
+   wget -q -O - https://get.k3s.io | K3S_URL=https://<MASTER_IP>:6443 K3S_TOKEN=<TOKEN> sh - 
    ```
 
 3. **Verifikationskommando**:
@@ -68,7 +68,7 @@ På varje Raspberry Pi-enhet som ska fungera som **worker-nod**, kör följande 
    sudo kubectl get nodes
    ```
 
-   Du bör nu se både master-noden och worker-noderna listade.
+   Du bör nu se både master-noden och worker-noderna listade som `Ready`.
 
 ### **Steg 4: Bekräfta Klustret**
 

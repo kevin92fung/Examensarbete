@@ -162,38 +162,130 @@ sudo systemctl restart networking
 ```
 [⬆️ Till toppen](#top)
 
-## Konfigurera brandvägg
-Installera UFW (Uncomplicated Firewall)
-```bash
-sudo apt install ufw
-```
-Tillåt åtkomst endast från specifika IP-adresser
-```bash
-# SSH
-sudo ufw allow from <192.168.xxx.0/24> to any port 22 proto tcp
+# Konfigurera brandväggen
+## **Steg 1: Konfigurera statiska portar för NFS**
+NFS använder flera tjänster som behöver statiska portar för att undvika konflikt med dynamiska portar. Detta gör brandväggskonfigurationen enklare.
 
-# HTTP
-sudo ufw allow from <192.168.xxx.0/24> to any port 80 proto tcp
+### **1.1 Redigera konfigurationsfil för NFS**
+Öppna och redigera filen `/etc/default/nfs-kernel-server`:
 
-# NFS
-sudo ufw allow from <192.168.xxx.0/24> to any port 2049 proto tcp
-sudo ufw allow from <192.168.xxx.0/24> to any port 111 proto tcp
-sudo ufw allow from <192.168.xxx.0/24> to any port 20048 proto tcp
-
-# SMB
-sudo ufw allow from <192.168.xxx.0/24> to any port 137 proto udp
-sudo ufw allow from <192.168.xxx.0/24> to any port 138 proto udp
-sudo ufw allow from <192.168.xxx.0/24> to any port 139 proto tcp
-sudo ufw allow from <192.168.xxx.0/24> to any port 445 proto tcp
-
-```
-Aktivera UFW
 ```bash
-sudo ufw enable
+sudo nano /etc/default/nfs-kernel-server
 ```
-Verifiera status
+
+Lägg till följande rader (eller uppdatera om de redan finns):
+
 ```bash
-sudo ufw status
+MOUNTD_PORT=20048
+STATD_PORT=32765
+LOCKD_TCPPORT=32803
+LOCKD_UDPPORT=32803
 ```
+
+### **1.2 Uppdatera tjänsterna**
+Öppna filen `/etc/services` och verifiera eller lägg till följande:
+
+```plaintext
+nfs             2049/tcp                          # NFS
+nfs             2049/udp                          # NFS
+mountd          20048/tcp                         # Mount daemon
+statd           32765/tcp                         # Statd daemon
+statd           32765/udp                         # Statd daemon
+lockd           32803/tcp                         # Lockd daemon
+lockd           32803/udp                         # Lockd daemon
+```
+
+Spara och stäng filen.
+
+### **1.3 Starta om tjänsterna**
+För att tillämpa ändringarna, starta om NFS och relaterade tjänster:
+
+```bash
+sudo systemctl restart nfs-kernel-server
+sudo systemctl restart rpcbind
+```
+
+---
+
+## **Steg 2: Konfigurera UFW-brandväggen**
+För att säkerställa att brandväggen tillåter nödvändiga tjänster och portar, konfigurera UFW enligt följande.
+
+### **2.1 Öppna portar för NFS**
+Öppna alla portar som behövs för NFS:
+
+```bash
+sudo ufw allow from 192.168.3.0/24 to any port 2049    # NFS
+sudo ufw allow from 192.168.3.0/24 to any port 20048   # mountd
+sudo ufw allow from 192.168.3.0/24 to any port 32765   # statd
+sudo ufw allow from 192.168.3.0/24 to any port 32803   # lockd
+```
+
+### **2.2 Öppna portar för SSH**
+SSH använder standardport **22**. Tillåt endast trafik från ditt lokala nätverk:
+
+```bash
+sudo ufw allow from 192.168.3.0/24 to any port 22
+```
+
+### **2.3 Öppna portar för SMB**
+SMB använder flera portar. Öppna dem så här:
+
+```bash
+sudo ufw allow from 192.168.3.0/24 to any port 137    # NetBIOS Name Service
+sudo ufw allow from 192.168.3.0/24 to any port 138    # NetBIOS Datagram Service
+sudo ufw allow from 192.168.3.0/24 to any port 139    # NetBIOS Session Service
+sudo ufw allow from 192.168.3.0/24 to any port 445    # Microsoft-DS
+```
+
+### **2.4 Öppna portar för HTTP**
+HTTP och HTTPS använder standardportarna **80** och **443**. Öppna dem så här:
+
+```bash
+sudo ufw allow from 192.168.3.0/24 to any port 80     # HTTP
+sudo ufw allow from 192.168.3.0/24 to any port 443    # HTTPS
+```
+
+### **2.5 Kontrollera UFW-regler**
+När alla portar är öppnade kan du kontrollera att reglerna är korrekt tillämpade:
+
+```bash
+sudo ufw status verbose
+```
+
+---
+
+## **Steg 3: Testa anslutningar**
+Efter att ha konfigurerat brandväggen och tjänsterna:
+
+1. **NFS:** Testa att montera NFS-delningen från en klient:
+   ```bash
+   sudo mount -t nfs -o vers=4 192.168.3.210:/export/Shared-drive /mnt/NAS
+   ```
+
+2. **SSH:** Testa att ansluta via SSH:
+   ```bash
+   ssh user@192.168.3.210
+   ```
+
+3. **SMB:** Testa att ansluta till SMB-delningar:
+   ```bash
+   smbclient -L //192.168.3.210 -U username
+   ```
+
+4. **HTTP:** Öppna en webbläsare och navigera till:
+   ```
+   http://192.168.3.210
+   ```
+
+---
+
+## **Sammanfattning av brandväggsregler**
+### Öppnade portar:
+| **Tjänst**  | **Port(ar)**             | **Beskrivning**                          |
+|-------------|--------------------------|------------------------------------------|
+| NFS         | 2049, 20048, 32765, 32803 | Huvudportar och relaterade tjänster      |
+| SSH         | 22                       | Fjärranslutning                         |
+| SMB         | 137, 138, 139, 445       | SMB-tjänster för fil- och skrivardelning |
+| HTTP/HTTPS  | 80, 443                  | Webbtjänster                             |
+
 [⬆️ Till toppen](#top)
-
