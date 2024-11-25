@@ -161,3 +161,39 @@ Spara och starta om nätverksgränssnittet:
 sudo systemctl restart networking
 ```
 [⬆️ Till toppen](#top)
+
+## Konfigurera brandvägg
+Installera UFW (Uncomplicated Firewall)
+```bash
+sudo apt install ufw
+```
+Tillåt åtkomst endast från specifika IP-adresser
+```bash
+# SSH
+sudo ufw allow from <192.168.xxx.0/24> to any port 22 proto tcp
+
+# HTTP
+sudo ufw allow from <192.168.xxx.0/24> to any port 80 proto tcp
+
+# NFS
+sudo ufw allow from <192.168.xxx.0/24> to any port 2049 proto tcp
+sudo ufw allow from <192.168.xxx.0/24> to any port 111 proto tcp
+sudo ufw allow from <192.168.xxx.0/24> to any port 20048 proto tcp
+
+# SMB
+sudo ufw allow from <192.168.xxx.0/24> to any port 137 proto udp
+sudo ufw allow from <192.168.xxx.0/24> to any port 138 proto udp
+sudo ufw allow from <192.168.xxx.0/24> to any port 139 proto tcp
+sudo ufw allow from <192.168.xxx.0/24> to any port 445 proto tcp
+
+```
+Aktivera UFW
+```bash
+sudo ufw enable
+```
+Verifiera status
+```bash
+sudo ufw status
+```
+[⬆️ Till toppen](#top)
+
