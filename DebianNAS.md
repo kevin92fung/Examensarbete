@@ -235,3 +235,22 @@ För att övervaka Samba-servern:
 ```bash
 sudo journalctl -u smbd
 ```
+
+### 26. Byta IP på NAS-enheten
+För att ändra IP-adressen på NAS-enheten:
+```bash	
+sudo nano /etc/network/interfaces
+```
+Uppdatera konfigurationsfilen med din nya IP-adress.
+```bash
+auto eth0
+iface eth0 inet static
+  address <192.168.xxx.xxx>
+  netmask 255.255.255.0
+  gateway <192.168.xxx.1>
+  dns-nameservers 8.8.8.8 8.8.4.4
+```
+Spara och starta om nätverksgränssnittet:
+```bash
+sudo systemctl restart networking
+```
