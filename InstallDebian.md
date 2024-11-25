@@ -141,3 +141,40 @@
    ```bash
    användarnamn ALL=(ALL:ALL) ALL
    ```
+
+
+
+
+---
+---
+---
+
+
+
+
+# Steg för att lägga till 6 nya VHDX-diskar till Debian VM i Hyper-V
+
+---
+
+## **1. Skapa och bifoga 6 nya VHDX-diskar**
+
+### **1.1. Skapa VHDX-diskarna med PowerShell**
+
+Kör följande PowerShell-skript för att skapa och bifoga 6 nya VHDX-diskar med dynamisk expansion till din VM. Byt ut sökvägen och VM-namnet om det behövs.
+
+```powershell
+# Definiera VM-namn och VHDX-sökväg
+$VMName = "Debian"
+$VHDDirPath = "C:\VM\Debian\Virtual Hard Disks"
+
+# Skapa och bifoga 6 nya VHDX-diskar med dynamisk expansion
+for ($i = 1; $i -le 6; $i++) {
+    $VHDXPath = "$VHDDirPath\$VMName-Disk$i.vhdx"
+    
+    # Skapa VHDX med dynamisk expansion
+    New-VHD -Path $VHDXPath -SizeBytes 10GB -Dynamic
+
+    # Bifoga den nyskapade VHDX-disk till VM:n
+    Add-VMHardDiskDrive -VMName $VMName -Path $VHDXPath
+}
+```

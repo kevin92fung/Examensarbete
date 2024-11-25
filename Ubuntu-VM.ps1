@@ -10,7 +10,7 @@ $VMDirPath = "$VMPath\Virtual Machines"
 $VHDDirPath = "$VMPath\Virtual Hard Disks"
 
 # Define the path to the placeholder VHDX file
-$VHDXPath = "C:\VM\Files\Backup\Debian.vhdx"
+$VHDXPath = "C:\VM\Files\Backup\UbuntuServer.vhdx"
 
 # Define the target path for the copied VHDX
 $VHDXTargetPath = "$VHDDirPath\$VMName.vhdx"
