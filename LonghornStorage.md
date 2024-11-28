@@ -76,12 +76,14 @@ För att slippa specificera `storageClassName: longhorn` i varje Persistent Volu
 ```bash
 kubectl patch storageclass longhorn -p '{"metadata":{"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
 ```
+Ta bort local-path som default StorageClass:
+```bash
+kubectl patch storageclass local-path -p '{"metadata":{"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
+```
 
 När detta är gjort kommer alla PVC:er som skapas utan att specificera `storageClassName` automatiskt att använda Longhorn.
 
----
-
-### Lägga till Longhorn UI och öppna upp med NodePort
+#### 4. **Lägga till Longhorn UI och öppna upp med NodePort**
 
 För att lägga till Longhorn UI och göra det tillgängligt via NodePort, gör följande:
 
@@ -159,18 +161,7 @@ För att lägga till Longhorn UI och göra det tillgängligt via NodePort, gör 
 
    Ersätt `<Virtuellt-IP>` med den faktiska IP-adressen för din Kubernetes-node.
 
-
-#### 3. **Sätt Longhorn som default StorageClass**
-
-För att slippa specificera `storageClassName: longhorn` i varje Persistent Volume Claim (PVC) kan du sätta Longhorn som default StorageClass:
-
-```bash
-kubectl patch storageclass longhorn -p '{"metadata":{"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
-```
-
-När detta är gjort kommer alla PVC:er som skapas utan att specificera `storageClassName` automatiskt att använda Longhorn.
-
-#### 4. **Skapa Persistent Volume Claim (PVC) och Pod Exempel**
+#### 5. **Skapa Persistent Volume Claim (PVC) och Pod Exempel**
 
 För att använda Longhorn, skapa en Persistent Volume Claim (PVC) som begär lagring från Longhorn och en pod som monterar denna volym.
 
@@ -219,7 +210,7 @@ För att använda Longhorn, skapa en Persistent Volume Claim (PVC) som begär la
 
    Denna pod använder PVC:n som skapats ovan och monterar volymen på `/data` inuti containern.
 
-#### 5. **Skapa PVC och Pod**
+#### 6. **Skapa PVC och Pod**
 
 Kör följande kommandon för att skapa PVC:n och podden:
 
@@ -228,7 +219,7 @@ kubectl create -f pvc.yaml
 kubectl create -f pod.yaml
 ```
 
-#### 6. **Verifiera PVC och PV Skapande**
+#### 7. **Verifiera PVC och PV Skapande**
 
 Efter att ha tillämpat YAML-filerna kan du verifiera skapandet av Persistent Volume (PV) och Persistent Volume Claim (PVC):
 
@@ -239,7 +230,7 @@ kubectl get pvc
 
 Detta visar statusen för PVC:n och dess associerade PV.
 
----
+--- 
 
 ### Backup-konfiguration med NAS
 
@@ -259,6 +250,7 @@ Detta visar statusen för PVC:n och dess associerade PV.
    - Backuper av snapshots lagras på det konfigurerade backupmålet (NAS).
 
 ---
+
 
 ### Sammanfattning av Hur Longhorn Storage Fungerar
 
