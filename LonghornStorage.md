@@ -1,3 +1,7 @@
+Här är den uppdaterade guiden med de senaste tilläggen och instruktionerna för att lägga till Longhorn UI och öppna upp det med NodePort:
+
+---
+
 # Longhorn Storage
 ## Installations- och konfigurationsguide för Longhorn med Persistent Volumes
 
@@ -68,6 +72,97 @@ För att Longhorn ska fungera korrekt, behöver du installera och aktivera **Ope
    ```bash
    kubectl get pods -n longhorn-system
    ```
+
+#### 3. **Sätt Longhorn som default StorageClass**
+
+För att slippa specificera `storageClassName: longhorn` i varje Persistent Volume Claim (PVC) kan du sätta Longhorn som default StorageClass:
+
+```bash
+kubectl patch storageclass longhorn -p '{"metadata":{"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+```
+
+När detta är gjort kommer alla PVC:er som skapas utan att specificera `storageClassName` automatiskt att använda Longhorn.
+
+---
+
+### Lägga till Longhorn UI och öppna upp med NodePort
+
+För att lägga till Longhorn UI och göra det tillgängligt via NodePort, gör följande:
+
+1. **Verifikation av Longhorn Pods**:
+   Kontrollera att Longhorn-podarna körs korrekt i ditt kluster:
+   ```bash
+   kubectl get pods -n longhorn-system
+   ```
+
+2. **Ändra Longhorn frontend service till NodePort**:
+   För att göra Longhorn UI tillgängligt via en NodePort, redigera tjänsten `longhorn-frontend`:
+
+   ```bash
+   EDITOR=nano kubectl edit service -n longhorn-system longhorn-frontend
+   ```
+
+   Detta öppnar filen i Nano, där du gör följande ändringar:
+
+   - Lägg till en ledig port under `ports` sektionen:
+     ```yaml
+     nodePort: 30080    # Lägg till denna rad för att öppna upp en port
+     ```
+
+   - Ändra `type` till `NodePort` istället för `ClusterIP`:
+     ```yaml
+     type: NodePort     # Ändrar från ClusterIP till NodePort
+     ```
+
+   Här är hur din uppdaterade service YAML bör se ut:
+   ```yaml
+   apiVersion: v1
+   kind: Service
+   metadata:
+     annotations:
+       kubectl.kubernetes.io/last-applied-configuration: |
+         {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"app":"longhorn-ui","app.kubernetes.io> 
+     creationTimestamp: "2024-11-28T19:13:48Z"
+     labels:
+       app: longhorn-ui
+       app.kubernetes.io/instance: longhorn
+       app.kubernetes.io/name: longhorn
+       app.kubernetes.io/version: v1.7.2
+     name: longhorn-frontend
+     namespace: longhorn-system
+     resourceVersion: "13830"
+     uid: aa35d956-04f0-402b-a2b2-2526b3964068
+   spec:
+     clusterIP: 10.43.16.69
+     clusterIPs:
+     - 10.43.16.69
+     externalTrafficPolicy: Cluster
+     internalTrafficPolicy: Cluster
+     ipFamilies:
+     - IPv4
+     ipFamilyPolicy: SingleStack
+     ports:
+     - name: http
+       nodePort: 30080    # Lägg till denna rad, öppna upp med en ledig port
+       port: 80
+       protocol: TCP
+       targetPort: http
+     selector:
+       app: longhorn-ui
+     sessionAffinity: None
+     type: NodePort     # Ändrar från ClusterIP till NodePort
+   status:
+     loadBalancer: {}
+   ```
+
+3. **Åtkomst via webbläsaren**:
+   Efter att du har sparat ändringarna kan du öppna Longhorn UI genom att besöka:
+   ```plaintext
+   http://<Virtuellt-IP>:30080
+   ```
+
+   Ersätt `<Virtuellt-IP>` med den faktiska IP-adressen för din Kubernetes-node.
+
 
 #### 3. **Sätt Longhorn som default StorageClass**
 
