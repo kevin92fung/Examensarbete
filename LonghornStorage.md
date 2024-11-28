@@ -1,7 +1,3 @@
-Här är den uppdaterade guiden med de senaste tilläggen och instruktionerna för att lägga till Longhorn UI och öppna upp det med NodePort:
-
----
-
 # Longhorn Storage
 ## Installations- och konfigurationsguide för Longhorn med Persistent Volumes
 
