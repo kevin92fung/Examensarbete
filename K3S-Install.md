@@ -119,8 +119,12 @@ För att lägga till **Worker-noder** i ditt K3s-kluster, använd token som finn
    ```bash
    cat /var/lib/rancher/k3s/server/node-token
    ```
+2. Installera Curl
+   ```bash
+   apt install curl -y
+   ```
 
-2. Använd tokenet för att ansluta en Worker-node:
+3. Använd tokenet för att ansluta en Worker-node:
 
    ```bash
    curl -sfL https://get.k3s.io | K3S_URL=https://<Virtuellt-IP>:6443 K3S_TOKEN=<TOKEN-från-MASTER> sh -
