@@ -118,6 +118,54 @@
 
 [⬆️ Till toppen](#top)
 
+
+## **6. Ändra IP-adress**
+### **Steg 1: Redigera nätverkskonfigurationsfilen**
+Debian använder vanligtvis `/etc/network/interfaces` för nätverkskonfiguration.
+
+1. Öppna filen för redigering:
+   ```bash
+   sudo nano /etc/network/interfaces
+   ```
+
+2. Ändra konfigurationen för din nätverksanslutning. Exempel för en statisk IP:
+   ```plaintext
+   auto eth0
+   iface eth0 inet static
+       address 192.168.1.100
+       netmask 255.255.255.0
+       gateway 192.168.1.1
+       dns-nameservers 8.8.8.8 8.8.4.4
+   ```
+
+   Byt ut `192.168.1.100`, `255.255.255.0` och `192.168.1.1` mot dina nya IP-inställningar.
+
+3. Spara och stäng filen:
+   - Tryck på `Ctrl + O` för att spara.
+   - Tryck på `Ctrl + X` för att stänga.
+
+---
+
+### **Steg 2: Starta om nätverkstjänsten**
+Efter att du har redigerat filen behöver du starta om nätverket:
+```bash
+sudo systemctl restart networking
+```
+
+---
+
+### **Steg 3: Kontrollera den nya IP-adressen**
+Verifiera att IP-adressen har ändrats:
+```bash
+ip addr show
+```
+
+Om du ser den nya IP-adressen är ändringen framgångsrik!
+
+[⬆️ Till toppen](#top)
+
+---
+
 ---
 
 ## **Felsökning**

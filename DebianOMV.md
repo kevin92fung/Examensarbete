@@ -111,7 +111,7 @@ omv-salt deploy run systemd-networkd
 Logga in via SSH på OMV-servern och ändra rättigheter för din mapp:
 ```bash
 chown -R nobody:nogroup /srv/<din nya raid>/<mappens namn>
-chmod -R 777 /srv/<din nya raid>/<mappens namn>
+chmod -R 2777 /srv/<din nya raid>/<mappens namn>
 ```
 
 ---
