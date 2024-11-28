@@ -29,6 +29,7 @@ Longhorn skapar backuper och snapshots av volymer och lagrar dem på externa må
 - Ett Kubernetes-kluster (K3s stöder Longhorn).
 - Kubernetes `kubectl` konfigurerat för att hantera ditt kluster.
 - **Open-iSCSI** måste vara installerat på varje maskin i klustret för att Longhorn ska kunna använda iSCSI som transportprotokoll.
+- Kör som root eller användare med sudo-behörigheter.
 
 #### 1. **Installera Open-iSCSI på varje maskin**
 För att Longhorn ska fungera korrekt, behöver du installera och aktivera **Open-iSCSI** på varje nod i ditt Kubernetes-kluster. Följ dessa steg:
@@ -36,15 +37,15 @@ För att Longhorn ska fungera korrekt, behöver du installera och aktivera **Ope
 1. **Installera Open-iSCSI**:
    För Ubuntu/Debian:
    ```bash
-   sudo apt-get update
-   sudo apt-get install -y open-iscsi
+   apt-get update
+   apt-get install -y open-iscsi
    ```
 
 2. **Aktivera och starta Open-iSCSI-tjänsten**:
    För att säkerställa att tjänsten startar vid uppstart och är igång, kör följande kommandon:
    ```bash
-   sudo systemctl enable iscsid
-   sudo systemctl start iscsid
+   systemctl enable iscsid
+   systemctl start iscsid
    ```
 
 3. **Bekräfta att Open-iSCSI är aktivt**:
