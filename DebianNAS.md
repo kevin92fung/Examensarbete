@@ -148,7 +148,7 @@ ls ld
 ```
 Det ska se ut på detta sätt:
 
-drwxrwsrwx 3 nobody nogroup 4096 Nov 29 14:18 .
+`drwxrwsrwx 3 nobody nogroup 4096 Nov 29 14:18 .`
 
 ---
 
