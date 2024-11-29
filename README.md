@@ -9,29 +9,32 @@ Projektet innebär att bygga en **Kubernetes-baserad infrastruktur** med hjälp 
 
 ```
 +-------------------------+            +------------------------+           +------------------------+
-|   Kubernetes Master VM  | <------->  |     Raspberry Pi 5      | <----->   |     Raspberry Pi 5      |
-|   (Debian VM)           |            |   Worker Node 1         |           |     Worker Node 2      |
-|   (K8s Controller)      |            +------------------------+           +------------------------+
-|   - Deploy, Scale,      |                                                     |
-|     Manage Pods         |                                                     |
+|   Kubernetes Master VM  | <------->  |     Worker Node 1      | <----->   |     Worker Node 2      |
+|   (Debian VM)           |            |   (Raspberry Pi 5)     |           |   (Raspberry Pi 5)     |
+|   - Taints Applied      |            +------------------------+           +------------------------+
+|   - Controls Cluster    |                                                     |
+|                         |                                                     |
 +-------------------------+            +-----------------------------------+    |
-                                        |  Persistent Volumes (NFS or USB)  |    |
+                                        |  Persistent Volumes (Longhorn)   |    |
 +-------------------------+            |                                   |    |
-|      OpenMediaVault      | <--------> |                                   |    |
-|     (NAS Storage)       |            |                                   |    |
-|    - NFS Shares, Data   |            |                                   |    |
+|         NAS              | <--------> |                                   |    |
+|   (Debian-based NAS)    |            |                                   |    |
+|   - NFS Shares, Data    |            |                                   |    |
+|   - Backup for Longhorn |            |                                   |    |
 +-------------------------+            +-----------------------------------+    |
                                         |                                   |    |
                                         v                                   v    v
                                 +---------------------+       +---------------------+
                                 | Kubernetes Pods     |       | Persistent Storage   |
-                                | - Jellyfin/Plex      |       | - OpenMediaVault     |
-                                | - Radarr             |       | - Mealie             |
-                                | - Sonarr             |       | - Nextcloud          |
-                                | - Home Assistant     |       |                     |
-                                | - Pi-hole            |       |                     |
-                                | - Dashboard          |       |                     |
-                                | - Portainer          |       |                     |
+                                | - Jellyfin          |       | - Longhorn           |
+                                | - Radarr            |       | - NAS (NFS)          |
+                                | - Sonarr            |       |                     |
+                                | - Mealie            |       |                     |
+                                | - Nextcloud         |       |                     |
+                                | - Home Assistant    |       |                     |
+                                | - Pi-hole           |       |                     |
+                                | - Dashboard         |       |                     |
+                                | - Portainer         |       |                     |
                                 +---------------------+       +---------------------+
                                          |
                                          v
