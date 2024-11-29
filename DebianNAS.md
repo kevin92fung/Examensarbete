@@ -129,6 +129,11 @@ echo '/dev/md0 /NAS ext4 defaults 0 0' | tee -a /etc/fstab
 mount -a
 ```
 
+Bekräfta att Volymen är monterad:
+```bash
+df -h
+```
+
 Ändra rättigheter på NAS-katalogen:
 
 ```bash
