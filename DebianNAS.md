@@ -181,7 +181,7 @@ Lägg till följande rad:
 ```bash
 /NAS/backup <ip-till-enhet-som-ska-nå-nfs>/24(rw,sync,no_subtree_check,no_root_squash,insecure)
 ```
-
+- `192.168.xxx.0/24`tillåter att alla enheter inom det nätverket har tillgång till NFS
 Förklaring av NFS-inställningar:
 - `rw`: Läst och skriv åtkomst
 - `sync`: Synkronisering av skrivoperationer
@@ -193,6 +193,10 @@ Ladda om NFS-konfigurationen:
 
 ```bash
 exportfs -ra
+```
+Bekräfta NFS-konfiguration:
+```bash
+exportfs -v
 ```
 
 Starta och aktivera NFS-servern:
@@ -224,7 +228,7 @@ Lägg till följande sektion för delning:
 Starta och aktivera SMB-tjänsten:
 
 ```bash
-systemctl start smbd
+systemctl restart smbd
 systemctl enable smbd
 ```
 
