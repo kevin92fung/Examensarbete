@@ -135,7 +135,7 @@ df -h
 ```
 Det ska se ut på detta sätt:
 
-```bash
+<pre>
 udev            1.9G     0  1.9G   0% /dev
 tmpfs           392M  2.0M  390M   1% /run
 /dev/sda2       124G  1.9G  115G   2% /
@@ -144,7 +144,7 @@ tmpfs           5.0M     0  5.0M   0% /run/lock
 /dev/sda1       511M  5.9M  506M   2% /boot/efi
 tmpfs           392M     0  392M   0% /run/user/1000
 /dev/md0         59G   24K   56G   1% /NAS
-```
+</pre>
 Ändra rättigheter på NAS-katalogen:
 
 ```bash
