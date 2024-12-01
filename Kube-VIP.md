@@ -143,10 +143,120 @@ För att tilldela VIP:er för tjänster och Control Plane, definiera en adresspo
 
 ---
 
-## **Sammanfattning av Stegen**:
+Självklart! Här kommer en sektion som förklarar hur du öppnar upp en service mot en av adresserna i VIP-poolen, inklusive exempel på hur du kan tilldela en specifik IP från poolen.
 
-1. **Installera Kube-VIP** och skapa manifestet för DaemonSet.
-2. **Definiera och skapa en adresspool** genom ConfigMap för att tilldela VIP:er.
-3. **Verifiera att VIP:erna är tilldelade** för både Control Plane och tjänster.
-4. **Starta om Kubelet och DaemonSet** om VIP:er inte tilldelas korrekt.
-5. **Verifiera att tjänster och pods använder rätt VIP** och rulla om vid behov.
+---
+
+## **Steg 5: Exponera en Service med VIP från Adresspoolen**
+
+För att öppna upp en service och tilldela den en VIP från den adresspool som definierats, kan du använda `LoadBalancer`-typen för din Kubernetes-service. Här är stegen för att exponera en service via en specifik VIP-adress från poolen.
+
+### **Exempel på en Service som Användar VIP från Poolen**
+
+Antag att vi har en service som vi vill exponera, t.ex. **Longhorn** (en lagringstjänst). Vi vill att denna service ska använda en IP från adresspoolen, exempelvis `<ip-från-pool>` (ersätt detta med en faktisk IP från din adresspool, som t.ex. `192.168.1.225`).
+
+1. **Skapa en Service med LoadBalancer-typ**:
+
+   Här är ett exempel på en YAML-definition för en Kubernetes-service som använder VIP från poolen. I detta fall tilldelar vi VIP till en `LoadBalancer`-service.
+
+   Skapa en fil, t.ex. `longhorn-service.yaml`, och använd följande innehåll:
+
+   ```yaml
+   apiVersion: v1
+   kind: Service
+   metadata:
+     name: longhorn
+     namespace: longhorn-system
+   spec:
+     selector:
+       app: longhorn
+     ports:
+       - protocol: TCP
+         port: 80
+         targetPort: 80
+     type: LoadBalancer
+     loadBalancerIP: <ip-från-pool>
+   ```
+
+   - **loadBalancerIP:** Här sätter vi den specifika IP-adressen från adresspoolen, som du vill att denna tjänst ska exponeras på. Exempel: `loadBalancerIP: 192.168.1.225`.
+
+2. **Applicera YAML-filen för att skapa tjänsten**:
+
+   Kör följande kommando för att skapa och tillämpa servicen i ditt kluster:
+
+   ```bash
+   kubectl apply -f longhorn-service.yaml
+   ```
+
+3. **Verifiera att servicen är skapad och tilldelad rätt IP**:
+
+   Efter att du har tillämpat manifestet, kan du kontrollera att servicen har tilldelats rätt VIP från adresspoolen genom att köra:
+
+   ```bash
+   kubectl get svc longhorn -n longhorn-system
+   ```
+
+   Detta kommando ska ge ett resultat liknande följande:
+
+   ```
+   NAME      TYPE           CLUSTER-IP     EXTERNAL-IP     PORT(S)        AGE
+   longhorn  LoadBalancer   10.96.0.1      192.168.1.225   80:31322/TCP   5m
+   ```
+
+   Här ser du att **EXTERNAL-IP** är satt till den IP-adress från adresspoolen som du har tilldelat, i detta fall `192.168.1.225`.
+
+4. **Testa åtkomst till tjänsten via den tilldelade VIP-adressen**:
+
+   Efter att du har skapat servicen och verifierat att den har fått en extern IP, kan du testa att nå tjänsten via den VIP-adress som du har tilldelat.
+
+   Öppna en webbläsare eller använd ett verktyg som `curl` för att testa åtkomsten till tjänsten. I detta exempel, om du exponerar Longhorn på port 80, kan du göra följande:
+
+   ```bash
+   curl http://192.168.1.225
+   ```
+
+   Detta ska ge dig åtkomst till tjänsten via den externa VIP-adressen som du har tilldelat.
+
+---
+
+## **Sammanfattning av Stegen för att Installera Kube-VIP och Exponera en Service med VIP från Poolen**
+
+### **Installation av Kube-VIP**
+
+1. **Installera Kube-VIP** och skapa manifestet för DaemonSet:
+   - Installera RBAC och skapa ett manifest för att konfigurera Kube-VIP på ditt Kubernetes-kluster.
+   - Definiera VIP, nätverksinterface och andra parametrar för Kube-VIP.
+
+2. **Definiera och skapa en adresspool** genom ConfigMap:
+   - Skapa en ConfigMap för att definiera ett IP-intervall (adresspool) för VIP:er.
+   - Exempel: `kubectl create configmap -n kube-system kubevip --from-literal range-global=192.168.1.220-192.168.1.230`.
+
+3. **Applicera manifestet för Kube-VIP** och starta DaemonSet:
+   - Kör `kubectl apply -f kube-vip-manifest.yaml` för att starta Kube-VIP och börja hantera VIP:er för både Control Plane och tjänster.
+
+4. **Verifiera att VIP:erna är tilldelade**:
+   - Kontrollera att VIP:erna har tilldelats korrekt för både Control Plane och tjänster genom att använda kommandon som `kubectl get svc` för att säkerställa att rätt adresser används.
+
+5. **Starta om Kubelet och DaemonSet** om VIP:er inte tilldelas korrekt:
+   - Om VIP:erna inte tilldelas korrekt, rulla om DaemonSet eller starta om Kubelet för att säkerställa att inställningarna tillämpas.
+
+---
+
+### **Exponera en Service med VIP från Poolen**
+
+1. **Skapa en `LoadBalancer`-service** i Kubernetes med en specifik `loadBalancerIP` från adresspoolen:
+   - Skapa en YAML-fil för tjänsten och tilldela den en specifik IP-adress från adresspoolen. Exempel: `loadBalancerIP: 192.168.1.225`.
+
+2. **Applicera YAML-filen för att skapa och exponera servicen**:
+   - Kör `kubectl apply -f longhorn-service.yaml` för att skapa och exponera servicen.
+
+3. **Verifiera att servicen har tilldelats rätt VIP**:
+   - Kontrollera att servicen har tilldelats rätt VIP genom att köra: `kubectl get svc longhorn -n longhorn-system`.
+
+4. **Testa åtkomst till servicen via den tilldelade VIP-adressen**:
+   - Testa att du kan komma åt tjänsten via den tilldelade VIP-adressen genom att använda `curl` eller en webbläsare.
+
+---
+
+Denna guide ger dig en komplett process för att installera och konfigurera Kube-VIP för att hantera VIP:er för både **Control Plane** och **tjänster**, samt hur du exponerar en service och tilldelar den en specifik IP från din adresspool. Detta gör att du kan ha en mer kontrollerad nätverksåtkomst till dina tjänster inom Kubernetes-klustret.
+
