@@ -26,3 +26,4 @@
 - Skrev en guide om att sätta upp Portainer.
 - Uppdaterade min guide om RAID-konfiguration i Debian och NAS-skapande.
 - Lyckades konfigurera Longhorn-backup till NFS-servern.
+- Börjat kolla på hur Nextclouds ska installeras som en Pod
