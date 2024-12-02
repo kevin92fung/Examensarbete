@@ -1,0 +1,105 @@
+initsiera master-1, installera kubevip och sätt vip för tls-san
+
+
+curl -sfL https://get.k3s.io | K3S_TOKEN=SECRET sh -s - server \
+    --cluster-init \
+    --tls-san=192.168.3.220 \
+    --disable=traefik \
+    --disable=servicelb \
+    --node-taint CriticalAddonsOnly=true:NoExecute
+
+
+
+export VIP=192.168.3.220
+export INTERFACE=eth0
+KVVERSION=$(curl -sL https://api.github.com/repos/kube-vip/kube-vip/releases | jq -r ".[0].name")
+
+
+
+kubectl create configmap -n kube-system kubevip --from-literal range-global=192.168.3.230-192.168.3.250
+
+
+
+
+
+lägg till master, måste installera kubevip på varje master
+
+curl -sfL https://get.k3s.io | K3S_TOKEN=SECRET sh -s - server \
+    --server https://192.168.3.220:6443 \
+    --disable=traefik \
+    --disable=servicelb \
+    --node-taint CriticalAddonsOnly=true:NoExecute
+
+
+
+    master-noder måste installera
+    sudo, wget, gurl, jq
+
+    worker-noder måste installera
+    sudo, wget, gurl, jq, open-iscsi
+
+
+
+
+lägg till worker
+
+curl -sfL https://get.k3s.io | K3S_TOKEN=SECRET sh -s - agent \
+    --server https://192.168.3.220:6443
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  GNU nano 7.2                                /tmp/kubectl-edit-3126748142.yaml                                         # Please edit the object below. Lines beginning with a '#' will be ignored,
+# and an empty file will abort the edit. If an error occurs while saving this file will be
+# reopened with the relevant failures.
+#
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"app":"longhorn-ui","app.kubernetes.io>  creationTimestamp: "2024-12-02T13:04:13Z"
+  labels:
+    app: longhorn-ui
+    app.kubernetes.io/instance: longhorn
+    app.kubernetes.io/name: longhorn
+    app.kubernetes.io/version: v1.7.2
+  name: longhorn-frontend
+  namespace: longhorn-system
+  resourceVersion: "40312"
+  uid: 58a3d00a-c2e0-41c7-8be4-b7fe7845be0d
+spec:
+  allocateLoadBalancerNodePorts: true
+  clusterIP: 10.43.29.197
+  clusterIPs:
+  - 10.43.29.197
+  externalTrafficPolicy: Cluster
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: http
+    nodePort: 31010
+    port: 80
+    protocol: TCP
+    targetPort: http
+  selector:
+    app: longhorn-ui
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
