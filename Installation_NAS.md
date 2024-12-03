@@ -205,7 +205,7 @@ systemctl enable smbd
 
 ## Testa delning
 
-*NFS via annan Linux-enhet:*
+**NFS via annan Linux-enhet:**
 ```bash	
 #Installera nfs-common
 apt install nfs-common
@@ -217,8 +217,7 @@ mount <ip-till-nas>:/NAS/longhorn-Backup /mnt/backup
 df -h
 ```
 
-*SMB via Windows:*
-
+**SMB via Windows:**
 Öppna Utforskaren och skriv in följande adress i adressfältet:
 
 `\\<ip-till-NAS>`
