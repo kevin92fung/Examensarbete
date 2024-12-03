@@ -223,7 +223,9 @@ df -h
 `\\<ip-till-NAS>`
 Logga in med användare och lösenord från NAS-enheten.
 
+[⬆️ Till toppen](#top)
 
+---
 
 
 
@@ -232,7 +234,68 @@ Logga in med användare och lösenord från NAS-enheten.
 
 
 # YOLO style installations skript
+- Skriptet kräver att 4 diskar är anslutna till NAS-enheten.
+- Skapar en backup-katalog för longghorn och delar via NFS/SMB
+
+`Glöm inte att byta användarnamn och IP-adressen i skriptet`
 ```bash
 #!/bin/bash
+#Definera variabel för användarnamn
+username="<användarnamn>" # byt ut med användarnamnet du valde under installationen
 
+#Installera nödvändiga paket
+apt install nfs-kernel-server samba samba-common-bin sudo mdadm
+
+#Lägg till användaren i sudo-gruppen
+usermod -aG sudo $username
+
+#Redigera sudoers-filen för att ge användaren sudo-rättigheter
+echo "$username ALL=(ALL:ALL) ALL" >> /etc/sudoers
+
+#Skapa RAID-volymen
+mdadm --create --verbose /dev/md0 --level=5 --raid-devices=4 /dev/sdb /dev/sdc /dev/sdd /dev/sde
+
+#Spara RAID-volymen för automatisk montering vid omstart
+mdadm --detail --scan --verbose >> /etc/mdadm/mdadm.conf
+update-initramfs -u
+
+#Formatera RAID-volymen
+mkfs.ext4 /dev/md0
+
+#Skapa en monteringspunkt och montera RAID-volymen
+mkdir -p /NAS
+echo '/dev/md0 /NAS ext4 defaults 0 0' >> /etc/fstab
+systemctl daemon-reload
+mount -a
+
+#Skapa katalog för longhorn-Backup och ändra ägare och rättigheter
+mkdir -p /NAS/longhorn-Backup
+chown nobody:nogroup /NAS/longhorn-Backup
+chmod 2777 /NAS/longhorn-Backup
+
+#Lägger till NFS delningen i /etc/exports (byt ut IP-adressen)
+echo "/NAS/longhorn-Backup 192.168.3.0/24(rw,sync,no_subtree_check,no_root_squash,insecure)" >> /etc/exports
+
+#Ladda om NFS-konfigurationen
+exportfs -a
+
+#Bekräfta att NFS-delningen är tillagd
+exportfs -v
+
+#Starta och aktivera NFS-tjänsten
+systemctl start nfs-kernel-server
+systemctl enable nfs-kernel-server
+
+#Lägger till delningen i smb.conf
+cat <<EOF >> /etc/samba/smb.conf
+[longhorn-Backup]
+  path = /NAS/longhorn-Backup
+  browseable = yes
+  read only = no
+  guest ok = yes
+EOF
+
+#Starta och aktivera SMB-tjänsten
+systemctl restart smbd
+systemctl enable smbd
 ```
