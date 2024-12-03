@@ -41,7 +41,11 @@
 ### Måndag
 - Genomgång av Examensarbetet med handledare.
 - Installerade om klustret så den är Highly Available, använder kube-vip som lastbalanserare och Longhorn som centraliserad lagring.
+- Fick problem med att NAS inte fungerade efter omstart.
 
+### Tisdag
+- Installerar om NAS för klustert och säkerställer att raid monteras efter omstart.
+- Skriver guide om installation av NAS.
 
 
 
