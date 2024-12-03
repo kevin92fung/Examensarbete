@@ -227,12 +227,6 @@ Logga in med användare och lösenord från NAS-enheten.
 
 ---
 
-
-
-
-
-
-
 # YOLO style installations skript
 - Skriptet kräver att 4 diskar är anslutna till NAS-enheten.
 - Skapar en backup-katalog för longghorn och delar via NFS/SMB
@@ -299,3 +293,5 @@ EOF
 systemctl restart smbd
 systemctl enable smbd
 ```
+
+[⬆️ Till toppen](#top)
