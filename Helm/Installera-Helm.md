@@ -35,6 +35,11 @@ För att komma igång med Helm, följ dessa steg för att installera det på din
 
    # Verifiera installationen
    helm version
+
+   # Lägg till miljövariabel till K3S för Helm
+   echo "KUBECONFIG=/etc/rancher/k3s/k3s.yaml" >> /etc/environment
+   # Läs in miljövariabeln
+   source /etc/environment
    ```
 
 ---

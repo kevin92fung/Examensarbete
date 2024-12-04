@@ -55,6 +55,7 @@ curl -sfL https://get.k3s.io | K3S_TOKEN=SECRET sh -s - server \
 --tls-san=<Virtual-ip-loadbalancer> \
 --disable=traefik \
 --disable=servicelb \
+--advertise-address=<Virtual-ip-loadbalancer> \
 --node-taint CriticalAddonsOnly=true:NoExecute
 ```
 
@@ -72,9 +73,6 @@ kubectl get nodes
 ```
 - Master-noden bör visas som `Ready`.
 
-[⬆️ Till toppen](#top)
-
----
 
 ## Installation av Kube-VIP på Master-1
 
@@ -117,8 +115,78 @@ kubectl get pods -n kube-system | grep kube-vip
 ```
 - Du bör se en `kube-vip`-pod som är `Running`.
 
+3. Uppdatera serverns konfiguration för att använda Kube-VIP:
+```bash
+sed -i 's/127.0.0.1/'"$VIP"'/g' /etc/rancher/k3s/k3s.yaml
+```
+
 [⬆️ Till toppen](#top)
 
+---
+## Installation av K3S Master-2 och Master-3
+1. Installera K3S på de andra master-noderna:
+
+`Lägg till master-node i K3S och installera nödvändiga tillägg:`
+```bash
+apt install curl wget jq nfs-common -y
+curl -sfL https://get.k3s.io | K3S_TOKEN=SECRET sh -s - server \
+--tls-san=<Virtual-ip-loadbalancer> \
+--disable=traefik \
+--disable=servicelb \
+--advertise-address=<Virtual-ip-loadbalancer> \
+--node-taint CriticalAddonsOnly=true:NoExecute
+```
+**Bekräftelse**:
+- Kontrollera att K3S körs:
+```bash
+kubectl get nodes
+```
+- Master-noden bör visas som `Ready`.
+## Installation av Kube-VIP på Master-2 och Master-3
+
+**Förberedelser**: Byt ut `<IP som ska användas virtuellt för kontrollplanet>` och `<Namn på nätverkskort>` (t.ex. `eth0`).
+
+1. Installera RBAC-regler för Kube-VIP:
+```bash
+kubectl apply -f https://kube-vip.io/manifests/rbac.yaml
+```
+
+2. Generera och tillämpa Kube-VIP-konfiguration:
+```bash
+export VIP=<IP som ska användas virtuellt för kontrollplanet>
+export INTERFACE=<Namn på nätverkskort>
+KVVERSION=$(curl -sL https://api.github.com/repos/kube-vip/kube-vip/releases | jq -r ".[0].name")
+
+alias kube-vip="ctr image pull ghcr.io/kube-vip/kube-vip:$KVVERSION; ctr run --rm --net-host ghcr.io/kube-vip/kube-vip:$KVVERSION vip /kube-vip"
+
+kube-vip manifest daemonset \
+    --interface $INTERFACE \
+    --address $VIP \
+    --inCluster \
+    --taint \
+    --controlplane \
+    --services \
+    --arp \
+    --leaderElection > kube-vip-manifest.yaml
+
+kubectl apply -f kube-vip-manifest.yaml
+```
+
+**Bekräftelse**:
+- Kontrollera att Kube-VIP körs:
+```bash
+kubectl get pods -n kube-system | grep kube-vip
+```
+- Du bör se en `kube-vip`-pod som är `Running`.
+
+3. Uppdatera serverns konfiguration för att använda Kube-VIP:
+```bash
+sed -i 's/127.0.0.1/'"$VIP"'/g' /etc/rancher/k3s/k3s.yaml
+```
+
+[⬆️ Till toppen](#top)
+
+---
 ---
 
 ## Installation av K3S Worker-noder

@@ -46,6 +46,14 @@
 ### Tisdag
 - Installerar om NAS för klustert och säkerställer att raid monteras efter omstart.
 - Skriver guide om installation av NAS.
+- Installerade Helm och skrev guide
+- Försökte installera Portainer med helm, men fick problem med kluster ip och context
+- Skrev skript för att snabbare kunna installera K3S Master och Worker noder
+
+### Onsdag
+- Installerade kubectl på windows för att kunna använda kubectl i windows mot klustret.
+- Skrev guide om hur man installerar kubectl på windows och kopplar mot kubernetes klustret
+- Installation av WSL (Windows Subsystem for Linux) för att hantera klustret och kubectl.
 
 
 
