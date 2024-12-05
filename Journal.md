@@ -54,6 +54,11 @@
 - Installerade kubectl på windows för att kunna använda kubectl i windows mot klustret.
 - Skrev guide om hur man installerar kubectl på windows och kopplar mot kubernetes klustret
 - Installation av WSL (Windows Subsystem for Linux) för att hantera klustret och kubectl.
+- lyckades installera longhorn med helm och konfigurerade med parametrar.
+- Inget annat gick att installera med helm... återgår till att installera med kubectl och manifester.
+
+### Torsdag
+-
 
 
 

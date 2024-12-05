@@ -97,6 +97,10 @@ status:
 ```
 
 ---
+## Ta bort local-path från default storageclass
+```bash
+kubectl patch storageclass local-path -p '{"metadata":{"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
+```
 
 ## Verifiera installationen
 
@@ -140,6 +144,8 @@ helm upgrade --install longhorn longhorn/longhorn --namespace longhorn-system \
 --set service.ui.type=LoadBalancer \
 --set defaultSettings.backupTarget="nfs://$NAS_IP:$NFS_PATH" \ 
 --set persistence.reclaimPolicy=Retain
+
+kubectl patch storageclass local-path -p '{"metadata":{"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
 
 EDITOR=nano kubectl edit service -n longhorn-system longhorn-frontend
 ```
