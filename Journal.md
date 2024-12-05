@@ -58,7 +58,11 @@
 - Inget annat gick att installera med helm... återgår till att installera med kubectl och manifester.
 
 ### Torsdag
--
+- Installerade en admin intans, kopplade denna till klustret och  installerade senare helm
+- Installerade genom admin intans longhorn och rancher med helm
+- Skrev guide om att konfigureara Admin intans och koppla till klustret, samt installation av helm.
+- Skrev guide om hur man installerar longhorn med helm
+- Skrev guide om hur man installerar Rancher UI med helm
 
 
 

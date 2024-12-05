@@ -1,6 +1,17 @@
-######## INITIAL SETUP ########
+## Installationsskript för att sätta upp ett K3S-kluster
 
-#!/bin/bash
+### Förberedelser
+1. Minst 5 virtuella maskiner med Ubuntu/Debian eller 5x Raspberry Pi.
+2. Statiskt IP för varje enhet.
+3. Root-åtkomst till varje enhet.
+---
+
+### Initiera K3S
+**Detta skript installerar den första master-noden, sätter upp Kube-VIP som Daemonset, tilldelar kontrollplanet ett virtuellt IP och tilldelar en IP-pool för lastbalanseraren.**
+Kube-vip är en lastbalancerings tjänst
+Daemonset innebär att den kör på alla noder som uppfylelr kraven, i detta fall master noder
+
+```bash
 #Byt ut variabler för username, VIP och INTERFACE
 export username='kevin'
 export VIP='192.168.3.220'
@@ -38,11 +49,14 @@ kube-vip manifest daemonset \
     --arp \
     --leaderElection > kube-vip-manifest.yaml
 kubectl apply -f kube-vip-manifest.yaml
+kubectl apply -f https://raw.githubusercontent.com/kube-vip/kube-vip-cloud-provider/main/manifest/kube-vip-cloud-controller.yaml
 kubectl create configmap -n kube-system kubevip --from-literal range-global=$VIP_RANGE
+```
+---
 
-
-######### ADD MASTER NODE #########
-#!/bin/bash
+### Lägg till Master noder i klustert
+**Detta skript lägger till master-noder i klustret**
+```bash
 #Byt ut variabler för username och VIP
 export username='kevin'
 export VIP='192.168.3.220'
@@ -58,13 +72,13 @@ curl -sfL https://get.k3s.io | K3S_TOKEN=SECRET sh -s - server \
 --disable=traefik \
 --disable=servicelb \
 --node-taint CriticalAddonsOnly=true:NoExecute
+```
+---
 
 
-
-
-
-######### ADD WORKER NODE #########
-#!/bin/bash
+### Lägg till Worker noder i klustret
+**Detta skript lägger till Worker-noder i klustret**
+```bash
 #Byt ut variabler för username, VIP
 export username='kevin'
 export VIP='192.168.3.220'
@@ -76,13 +90,4 @@ systemctl enable iscsid
 systemctl start iscsid
 curl -sfL https://get.k3s.io | K3S_TOKEN=SECRET sh -s - agent \
     --server https://$VIP:6443
-
-
-
-
-
-
-
-
-apt update
-apt install curl wget jq nfs-common sudo open-iscsi bash grep gawk util-linux -y
+```
